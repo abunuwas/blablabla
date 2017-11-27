@@ -1,0 +1,11 @@
+install:
+  - pip2 install tox
+  - npm install
+  - \curl -sSL https://raw.githubusercontent.com/codeship/scripts/master/packages/mongodb.sh | MONGODB_VERSION=3.4.6 bash -s
+  - mkdir -p ~/clone/.requirements
+  - cp ~/clone/requirements* ~/clone/.requirements
+  - if ! eval "diff -u ~/cache/tox/.requirements ~/clone/.requirements"; then echo "Empyting tox cache becuase requirements have changed" && rm -rf ~/cache/tox; fi
+  - mkdir -p ~/cache/tox/.requirements
+  - cp ~/clone/.requirements/* ~/cache/tox/.requirements
+script:
+  - TOX_WORK_DIR=~/cache/tox MONGO_URI=mongodb://localhost:27018/test-service-policy tox

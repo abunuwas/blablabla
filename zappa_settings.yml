@@ -1,0 +1,91 @@
+common:
+  app_function: app.
+  aws_region: eu-west-1
+  binary_support: false  # TODO: change to True when these are released: https://github.com/Miserlou/Zappa/issues/1014 https://github.com/Miserlou/Zappa/issues/699 https://github.com/Miserlou/Zappa/issues/1035
+  cloudwatch_log_level: 'ERROR'
+  cloudwatch_data_trace: true
+  cloudwatch_metrics_enabled: true
+  exclude:
+    - '*.collection'
+    - '*.egg-info'
+    - '*.eggs'
+    - '*.zip'
+    - '.cache'
+    - '.editorconfig'
+    - '.env'
+    - local.env
+    - '.gitignore'
+    - '.idea'
+    - '.pre-commit-config.yaml'
+    - '.tox'
+    - benchmark_tests.py
+    - boto3
+    - botocore
+    - build*
+    - codeship.yml
+    - concurrent
+    - dateutil
+    - dist
+    - dredd.yml
+    - fabfile.py
+    - jmespath
+    - make_compiled_swagger.py
+    - node_modules
+    - package.json
+    - README.md
+    - run.py
+    - s3transfer
+    - scripts
+    - setup.py
+    - test_api.sh
+    - tests
+    - tox.ini
+  keep_warm: false
+  manage_roles: false
+  project_name: s-alerts-notifications
+  timeout_seconds: 300
+dev:
+  extends: common
+  environment_variables:
+    CONSOLE_LOG_LEVEL: DEBUG
+    DEBUG: 'TRUE'
+    ENV: DEV
+  events:
+    - function: app.jobs.trigger_job
+      event_source:
+        arn: arn:aws:sns:eu-west-1:330612717183:
+        events:
+        - sns:Publish
+  role_name:
+  s3_bucket: zappa-uploads-dev
+  settings_file: settings.dev
+stag:
+  extends: common
+  environment_variables:
+    CONSOLE_LOG_LEVEL: WARN
+    DEBUG: 'FALSE'
+    ENV: STAG
+  events:
+    - function:
+      event_source:
+        arn: arn:aws:sns:eu-west-1:330612717183:
+        events:
+          - sns:Publish
+  role_name:
+  s3_bucket: zappa-uploads-stag
+  settings_file: settings.stag
+prod:
+  extends: common
+  environment_variables:
+    CONSOLE_LOG_LEVEL: WARN
+    DEBUG: 'FALSE'
+    ENV: PROD
+  events:
+    - function:
+      event_source:
+        arn: arn:aws:sns:eu-west-1:181537326646:
+        events:
+          - sns:Publish
+  role_name:
+  s3_bucket: zappa-uploads-prod
+  settings_file: settings.prod

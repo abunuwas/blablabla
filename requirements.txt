@@ -1,0 +1,5 @@
+--extra-index-url https://pypi.boughtbymany.com/5c0a44cd-ec93-412c-b3a9-c3dfb72c22ee/
+bbm-wrench~=4.4
+pyyaml
+requests
+zappa>=0.43.2
