@@ -43,7 +43,7 @@ common:
   keep_warm: false
   manage_roles: false
   project_name: s-alerts-notifications
-  timeout_seconds: 300
+  runtime: python3.6
 dev:
   extends: common
   environment_variables:
@@ -51,12 +51,17 @@ dev:
     DEBUG: 'TRUE'
     ENV: DEV
   events:
-    - function: app.jobs.trigger_job
+    - function: app.app.lambda_handler
       event_source:
-        arn: arn:aws:sns:eu-west-1:330612717183:
+        arn: arn:aws:sns:eu-west-1:330612717183:api-gateway-5XX-dev
         events:
         - sns:Publish
-  role_name:
+    - function: app.app.lambda_handler
+      event_source:
+        arn: arn:aws:sns:eu-west-1:330612717183:api-gateway-timeout-dev
+        events:
+          - sns:Publish
+  role_name: zappa-execution-role-dev
   s3_bucket: zappa-uploads-dev
   settings_file: settings.dev
 stag:
@@ -66,12 +71,17 @@ stag:
     DEBUG: 'FALSE'
     ENV: STAG
   events:
-    - function:
+    - function: app.app.lambda_handler
       event_source:
-        arn: arn:aws:sns:eu-west-1:330612717183:
+        arn: arn:aws:sns:eu-west-1:330612717183:api-gateway-5XX-dev
         events:
           - sns:Publish
-  role_name:
+    - function: app.app.lambda_handler
+      event_source:
+        arn: arn:aws:sns:eu-west-1:330612717183:api-gateway-timeout-dev
+        events:
+          - sns:Publish
+  role_name: zappa-execution-role-stag
   s3_bucket: zappa-uploads-stag
   settings_file: settings.stag
 prod:
@@ -81,11 +91,16 @@ prod:
     DEBUG: 'FALSE'
     ENV: PROD
   events:
-    - function:
+    - function: app.app.lambda_handler
       event_source:
-        arn: arn:aws:sns:eu-west-1:181537326646:
+        arn: arn:aws:sns:eu-west-1:330612717183:api-gateway-5XX-dev
         events:
           - sns:Publish
-  role_name:
+    - function: app.app.lambda_handler
+      event_source:
+        arn: arn:aws:sns:eu-west-1:330612717183:api-gateway-timeout-dev
+        events:
+          - sns:Publish
+  role_name: zappa-execution-role-prod
   s3_bucket: zappa-uploads-prod
   settings_file: settings.prod
